@@ -72,6 +72,7 @@ export abstract class AbstractResourcePreferenceProvider extends PreferenceProvi
             const result = jsoncparser.applyEdits(content, edits);
 
             await resource.saveContents(result);
+            this.preferences[key] = value;
             this.onDidPreferencesChangedEmitter.fire(undefined);
         }
     }
@@ -79,7 +80,10 @@ export abstract class AbstractResourcePreferenceProvider extends PreferenceProvi
     protected async readPreferences(): Promise<void> {
         const newContent = await this.readContents();
         const strippedContent = jsoncparser.stripComments(newContent);
-        this.preferences = jsoncparser.parse(strippedContent);
+        const preferences = jsoncparser.parse(strippedContent);
+        if (preferences) {
+            this.preferences = preferences;
+        }
         this.onDidPreferencesChangedEmitter.fire(undefined);
     }
 
